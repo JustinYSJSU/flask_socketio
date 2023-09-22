@@ -1,0 +1,75 @@
+{% extends 'base.html' %} {% block content %}
+<!--
+    HTML Section
+    - rendering for the chat UI (room information, messaging box, etc)
+-->
+<div id="room-container">
+  <h1 id="home-header">Flask Chat 💬</h1>
+  <div id="room-subsection">
+    <h2 id="room-code-display">Room Code: <span>{{room}}</span></h2>
+    <a href="/" id="leave-chat-btn">Leave the Chat</a>
+  </div>
+  <div id="chat-room-widget">
+    <div id="msgs-container">
+      <ul id="messages"></ul>
+    </div>
+    <div id="message-box">
+      <input type="text" placeholder="Enter your message" id="message-input" name="message" />
+      <button type="submit" id="send-btn" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+<!--
+    JavaScript section
+    - Has socketio for the frontend / client side. essentially listens
+    for events from the socketio backend. 
+
+    createChatItem() will verify the sender, 
+    then create a small text bubble containing the inputted text 
+-->
+  <script type="text/javascript">
+    var socketio = io();
+    socketio.on("message", function (message) { createChatItem(message.message, message.sender) });
+
+    function createChatItem(message, sender) {
+      
+      var messages = document.getElementById("messages"); //get all html elements w/id "messages"
+      if (sender === "") {
+        content = `<p class="member-activity">${message}</p>`;
+      } else {
+        var senderIsUser = "{{user}}" === sender; //verify the sender. triple === means "same type and value"
+    
+        //create actual text display
+        var content = `
+          <li class="message-item ${senderIsUser ? "self-message-item" : "peer-message-item"}">
+              <p>${message}</p> 
+              <small class="${senderIsUser ? "muted-text" : "muted-text-white"}">${new Date().toLocaleString()}</small>
+          </li>
+      `;}
+
+      //add text display to the page
+      messages.innerHTML += content;
+    }
+
+
+    function sendMessage() {
+      //getting message input
+      var msgInput = document.getElementById("message-input");
+      //no input
+      if (msgInput.value === "") return;
+      //get the message, then "emit" a message event for the backend 
+      var msg = msgInput.value;
+      socketio.emit("message", { message: msg });
+      msgInput.value = "";
+    }
+  </script>
+
+  {% for message in messages %}
+  <script type="text/javascript">
+    createChatItem("{{message.message}}", "{{message.sender}}");
+  </script>
+  {% endfor %}
+
+</div>
+
+{% endblock %}
