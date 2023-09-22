@@ -29,6 +29,7 @@
 -->
   <script type="text/javascript">
     var socketio = io();
+    //anon function in javascript
     socketio.on("message", function (message) { createChatItem(message.message, message.sender) });
 
     function createChatItem(message, sender) {
