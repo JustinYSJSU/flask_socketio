@@ -20,7 +20,6 @@
   </div>
 
 <!--
-    JavaScript section
     - Has socketio for the frontend / client side. essentially listens
     for events from the socketio backend. 
 
@@ -30,8 +29,10 @@
   <script type="text/javascript">
     var socketio = io();
     //anon function in javascript
+    //"hears" message event fron the backend
     socketio.on("message", function (message) { createChatItem(message.message, message.sender) });
 
+    //creates a textbox for the message
     function createChatItem(message, sender) {
       
       var messages = document.getElementById("messages"); //get all html elements w/id "messages"
