@@ -98,19 +98,23 @@ def handle_connect():
 
 """
 handles "message" event from the javascript socket io (client side)
+payload = user message from the frontend
 """
 @socketio.on('message')
 def handle_message(payload):
+    #get the room / name from current session
     room = session.get('room')
     name = session.get('name')
+    #room doesn't exist
     if room not in rooms:
         return
+    #construct a "message" (sender name + message) 
     message = {
         "sender": name,
         "message": payload["message"]
     }
 
-    #send to the correct room, and add to "database"
+    #send to the correct room (client), and add to "database"
     send(message, to=room)
     rooms[room]["messages"].append(message)
 
